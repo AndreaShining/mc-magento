@@ -363,7 +363,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $product = $this->loadProductById($itemProductId);
             $productId = $product->getId();
             $productSyncData = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-            if ($productId != $itemProductId || $this->isBundleProduct($product) || $this->isGroupedProduct($product)) {
+            if ($productId != $itemProductId || $this->isBundleProduct($product)) {
                 if ($productId) {
                     $this->_updateSyncData($productId, $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
                 }
