@@ -329,7 +329,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $itemCount = 0;
         foreach ($items as $item) {
             $line = array();
-            if ($item->getProductType() == 'bundle' || $item->getProductType() == 'grouped') {
+            if ($item->getProductType() == 'bundle') {
                 continue;
             }
 
