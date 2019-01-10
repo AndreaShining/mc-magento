@@ -158,6 +158,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                         }
                                     }
                                     break;
+                                    case 'settoremerceologico':
+                                    if ($customer->getData($attributeCode)) {
+                                        $value = $customer->getResource()->getAttribute($attributeCode)->getFrontend()->getValue($customer);
+                                        $eventValue = $mergeVars[$key] = $value;
+                                    }
+
+                                    break;
                                 case 'group_id':
                                     if ($customer->getData($attributeCode)) {
                                         $group_id = (int)$customer->getData($attributeCode);
