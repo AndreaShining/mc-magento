@@ -363,7 +363,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $product = $this->loadProductById($itemProductId);
             $productId = $product->getId();
             $productSyncData = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-            if ($productId != $itemProductId || $this->isBundleProduct($product)) {
+            if ($productId != $itemProductId || $this->isBundleProduct($product) || $this->isGroupedProduct($product)) {
                 if ($productId) {
                     $this->_updateSyncData($productId, $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
                 }
@@ -707,6 +707,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $helper = $this->getMailChimpHelper();
             $imageUrl = $helper->getImageUrlById($parentId, $magentoStoreId);
         }
+
+
+
+
         return $imageUrl;
     }
 
@@ -759,6 +763,16 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (count($parentIds)) {
             $parentId = $parentIds[0];
         }
+
+
+        if(empty($parentId)){
+            $groupedParentsIds = Mage::getResourceSingleton('catalog/product_link')
+                ->getParentIdsByChild($childId, Mage_Catalog_Model_Product_Link::LINK_TYPE_GROUPED);
+            if (count($groupedParentsIds)) {
+                $parentId = $groupedParentsIds[0];
+            }
+        }
+
         return $parentId;
     }
 
@@ -812,6 +826,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $price = null;
         $parentId = null;
+
         if (!$this->currentProductIsVisible()) {
             $parentId = $this->getParentId($product->getId());
             if ($parentId) {
@@ -822,8 +837,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $price = $this->_parentPrice;
             }
         }
+
+        if($this->getEurofidesPrezzoUnitario($product->getId(), $magentoStoreId)){
+            $price = $this->getEurofidesPrezzoUnitario($product->getId(), $magentoStoreId);
+        }
+
+
         return $price;
     }
+
+
+
 
     /**
      * @return bool
@@ -840,6 +864,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
         return $price;
     }
+
+    protected function getEurofidesPrezzoUnitario($productId, $magentoStoreId)
+    {
+        $helper = $this->getMailChimpHelper();
+        $rc = $helper->getProductResourceModel();
+        $price = (float)$rc->getAttributeRawValue($productId, 'eurofides_prezzo_unitario', $magentoStoreId);
+        return $price;
+    }
+
 
     /**
      * @param $path
