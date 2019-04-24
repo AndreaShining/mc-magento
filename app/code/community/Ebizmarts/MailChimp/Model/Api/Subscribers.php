@@ -126,6 +126,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $mergeVars = array();
         $subscriberEmail = $subscriber->getSubscriberEmail();
         $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
+        /* settoremerceologico */
+        $settoreMerceologico = Mage::getResourceModel('eav/entity_attribute_collection')
+            ->setCodeFilter('settoremerceologico')
+            ->getFirstItem();
+        $settoreMerceologicoAttributeModel = Mage::getModel('eav/entity_attribute')->load($settoreMerceologico->getId());
+        /* settoremerceologico */
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
@@ -161,6 +167,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     case 'settoremerceologico':
                                     if ($customer->getData($attributeCode)) {
                                         $value = $customer->getResource()->getAttribute($attributeCode)->getFrontend()->getValue($customer);
+                                        $eventValue = $mergeVars[$key] = $value;
+                                    } elseif ($subscriber->getData($attributeCode)) {
+                                        $settoreMerceologicoValue = $settoreMerceologicoAttributeModel->getFrontend()->getValue($subscriber);
+                                        $value = $settoreMerceologicoValue;
                                         $eventValue = $mergeVars[$key] = $value;
                                     }
 
